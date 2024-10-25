@@ -1,0 +1,62 @@
+{
+  "users": [
+    {
+      "id": "45cb",
+      "name": "priya",
+      "email": "priya215@gmail.com",
+      "password": "priya"
+    },
+    {
+      "id": "ba7d",
+      "name": "radha",
+      "email": "radha2000@gmail.com",
+      "password": "radha20000"
+    },
+    {
+      "id": "4ccd",
+      "name": "Priyanka",
+      "email": "priyanka@gmail.com",
+      "password": "priyanka"
+    },
+    {
+      "id": "75ee",
+      "name": "Priti",
+      "email": "priti@gmail.com",
+      "password": "priti"
+    },
+    {
+      "id": "8f4e",
+      "name": "shubham",
+      "email": "subham@gmail.com",
+      "password": "subham"
+    },
+    {
+      "id": "91c1",
+      "name": "ranjana",
+      "email": "ranjana@gmail.com",
+      "password": "ranjana"
+    },
+    {
+      "id": "ba75",
+      "name": "Kapil",
+      "email": "kapil@gmail.com",
+      "password": "kapil"
+    }
+  ],
+  "orders": [
+    {
+      "id": "1",
+      "userId": 1,
+      "product": "Laptop",
+      "amount": 1200,
+      "status": "Delivered"
+    },
+    {
+      "id": "2",
+      "userId": 2,
+      "product": "Smartphone",
+      "amount": 800,
+      "status": "Shipped"
+    }
+  ]
+}
