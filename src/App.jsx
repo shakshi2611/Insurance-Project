@@ -12,7 +12,7 @@ import UploadPage from "./pages/UploadPage";
 import OrdersPage from "./pages/OrdersPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import SettingsPage from "./pages/SettingsPage";
-
+ 
 function App() {
   const location = useLocation(); 
   const [isComparisonViewed, setIsComparisonViewed] = useState(false);
