@@ -53,45 +53,45 @@ const OverviewPage = () => {
         // Log the fetched data to verify the structure
         console.log("Flattened Insurance Data:", flattenedInsuranceData);
 
-        // Process the data to add commission calculations
-        const processedInsuranceData = flattenedInsuranceData.map((item) => {
-          let commission = 0;
+        // // Process the data to add commission calculations
+        // const processedInsuranceData = flattenedInsuranceData.map((item) => {
+        //   let commission = 0;
 
-          // Log the entire item to see what properties are available
-          console.log("Current Item:", item);
+        //   // Log the entire item to see what properties are available
+        //   console.log("Current Item:", item);
 
-          // Access properties according to the actual data structure
-          const terrorismPremium =
-            parseFloat(item.TERRORISM_PREMIUM_AMOUNT) || 0; // Correct property name
-          const odPremium = parseFloat(item.MOTOR_OD_PREMIUM_AMOUNT) || 0; // Correct property name
-          const commissionRate = parseFloat(item.COMMISSION_RATE_USED) || 0; // Correct property name
-          const P_type = item.POL_PRI_VVERTICAL_DESC; // Assuming this is equivalent to p_type
+        //   // Access properties according to the actual data structure
+        //   const terrorismPremium =
+        //     parseFloat(item.TERRORISM_PREMIUM_AMOUNT) || 0; // Correct property name
+        //   const odPremium = parseFloat(item.MOTOR_OD_PREMIUM_AMOUNT) || 0; // Correct property name
+        //   const commissionRate = parseFloat(item.COMMISSION_RATE_USED) || 0; // Correct property name
+        //   const P_type = item.POL_PRI_VVERTICAL_DESC; // Assuming this is equivalent to p_type
 
-          // Log the values to check if they are being read correctly
-          console.log(
-            `Terrorism Premium: ${terrorismPremium}, OD Premium: ${odPremium}, Commission Rate: ${commissionRate}, P_type: ${P_type}`
-          );
+        //   // Log the values to check if they are being read correctly
+        //   console.log(
+        //     `Terrorism Premium: ${terrorismPremium}, OD Premium: ${odPremium}, Commission Rate: ${commissionRate}, P_type: ${P_type}`
+        //   );
 
-          if (P_type && P_type.toLowerCase().includes("fire")) {
-            // Adjusted check for 'fire' in p_type
-            const terrorismPremiumCommission = terrorismPremium * 0.05; // 5% of terrorism premium
-            const odPremiumCommission = odPremium * (commissionRate / 100); // Commission on OD premium
-            commission = terrorismPremiumCommission + odPremiumCommission; // Total commission
-          } else {
-            commission = odPremium * (commissionRate / 100); // Calculate commission on OD premium only
-          }
+        //   if (P_type && P_type.toLowerCase().includes("fire")) {
+        //     // Adjusted check for 'fire' in p_type
+        //     const terrorismPremiumCommission = terrorismPremium * 0.05; // 5% of terrorism premium
+        //     const odPremiumCommission = odPremium * (commissionRate / 100); // Commission on OD premium
+        //     commission = terrorismPremiumCommission + odPremiumCommission; // Total commission
+        //   } else {
+        //     commission = odPremium * (commissionRate / 100); // Calculate commission on OD premium only
+        //   }
 
-          // Log the calculated commission
-          console.log(`Item: ${JSON.stringify(item)}`);
-          console.log(`Calculated Commission: ${commission.toFixed(2)}`);
+        //   // Log the calculated commission
+        //   console.log(`Item: ${JSON.stringify(item)}`);
+        //   console.log(`Calculated Commission: ${commission.toFixed(2)}`);
 
-          return {
-            ...item,
-            commission: commission.toFixed(2), // Ensure it's a fixed decimal
-          };
-        });
+        //   return {
+        //     ...item,
+        //     commission: commission.toFixed(2), // Ensure it's a fixed decimal
+        //   };
+        // });
 
-        setInsuranceData(processedInsuranceData);
+        setInsuranceData(flattenedInsuranceData);
         setBrokerData(flattenedBrokerData);
       } catch (err) {
         setError(err.message);
@@ -123,13 +123,13 @@ const OverviewPage = () => {
   });
 
   const bankNames = [
-    ...new Set(insuranceData.map((item) => item["INTERMEDIARY_NAME"])),
+    ...new Set(insuranceData.map((item) => item["p_insurerName"])),
   ];
 
   // Filter data based on the selected bank
   const filteredData = (data) =>
     selectedBank
-      ? data.filter((item) => item["INTERMEDIARY_NAME"] === selectedBank)
+      ? data.filter((item) => item["p_insurerName"] === selectedBank)
       : data;
 
   // Function to render table with filtered data
@@ -359,16 +359,11 @@ const OverviewPage = () => {
         </motion.div>
 
         {/* Render Tables */}
-        {activeTable === "allData" &&
-          renderTable(filteredData(insuranceData), "All Data")}
+        {activeTable === "allData" && renderTable(insuranceData, "All Data")}
+        {activeTable === "matchData" && renderTable(matchData, "Match Data")}
+        {activeTable === "positiveData" && renderTable(positiveData, "+ Count Data")}
+        {activeTable === "negativeData" && renderTable(negativeData, "- Count Data")}
 
-        {activeTable === null && (
-          <>
-            {renderTable(filteredData(matchData), "Match Data")}
-            {renderTable(filteredData(positiveData), "Positive Data", true)}
-            {renderTable(filteredData(negativeData), "Negative Data", true)}
-          </>
-        )}
       </main>
     </div>
   );
