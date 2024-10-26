@@ -73,13 +73,6 @@ const OverviewPage = () => {
     return broker && insurance.commission === broker.commission;
   });
 
-// const positiveData = insuranceData.filter((insurance) =>
-//   brokerData.some(
-//     (broker) =>
-//       broker["Policy Number"] === insurance["Policy Number"] &&
-//       broker["commission"] < insurance["commission"] 
-//   )
-// );
 
 const positiveData = insuranceData.filter((insurance) => {
   const broker = brokerData.find(
@@ -94,21 +87,6 @@ const negativeData = insuranceData.filter((insurance) => {
   );
   return broker && insurance.commission > broker.commission;
 });
-  // // Filter increased data
-  // const positiveData = insuranceData.filter((insurance) => {
-  //   const broker = brokerData.find(
-  //     (broker) => broker["Policy Number"] === insurance["Policy Number"]
-  //   );
-  //   return broker && broker.Percentage < insurance.Percentage;
-  // });
-
-  // // Filter decreased data
-  // const negativeData = insuranceData.filter((insurance) => {
-  //   const broker = brokerData.find(
-  //     (broker) => broker["Policy Number"] === insurance["Policy Number"]
-  //   );
-  //   return broker && insurance.Percentage > broker.Percentage;
-  // });
 
   const bankNames = [
     ...new Set(brokerData.map((item) => item["p_insurerName"])),
@@ -329,9 +307,9 @@ const negativeData = insuranceData.filter((insurance) => {
         </motion.div>
 
         {activeTable === "allData" && renderTable(filteredData(brokerData), "All Data")}
-        {activeTable === "matchData" && renderTable(matchData, "Match Data")}
-        {activeTable === "positiveData" && renderTable(positiveData, "+ Count Data")}
-        {activeTable === "negativeData" && renderTable(negativeData, "- Count Data")}
+        {activeTable === "matchData" && renderTable(filteredData(matchData), "Match Data")}
+        {activeTable === "positiveData" && renderTable(filteredData(positiveData), "+ Count Data")}
+        {activeTable === "negativeData" && renderTable(filteredData(negativeData), "- Count Data")}
       </main>
     </div>
   );
