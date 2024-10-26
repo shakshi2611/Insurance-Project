@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
-import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { jsPDF } from "jspdf";
+import * as XLSX from "xlsx";
+import "jspdf-autotable";
 import {
   Table,
   TableBody,
@@ -23,25 +25,26 @@ import {
   IconButton,
   Menu,
 } from "@mui/material";
-import * as XLSX from "xlsx";
 
 const OverviewPage = () => {
   const [activeTable, setActiveTable] = useState(null);
   const [insuranceData, setInsuranceData] = useState([]);
   const [brokerData, setBrokerData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedBank, setSelectedBank] = useState("");
+  const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [insuranceResponse, brokerResponse] = await Promise.all([
-          axios.get("http://localhost:5001/insuranceFiles"),
-          axios.get("http://localhost:5001/brokerFiles"),
-        ]);
+        const insuranceResponse = await axios.get(
+          "http://localhost:5001/insuranceFiles"
+        );
+        const brokerResponse = await axios.get(
+          "http://localhost:5001/brokerFiles"
+        );
 
         const flattenedInsuranceData = insuranceResponse.data.flatMap(
           (file) => file.content
@@ -49,47 +52,6 @@ const OverviewPage = () => {
         const flattenedBrokerData = brokerResponse.data.flatMap(
           (file) => file.content
         );
-
-        // Log the fetched data to verify the structure
-        console.log("Flattened Insurance Data:", flattenedInsuranceData);
-
-        // // Process the data to add commission calculations
-        // const processedInsuranceData = flattenedInsuranceData.map((item) => {
-        //   let commission = 0;
-
-        //   // Log the entire item to see what properties are available
-        //   console.log("Current Item:", item);
-
-        //   // Access properties according to the actual data structure
-        //   const terrorismPremium =
-        //     parseFloat(item.TERRORISM_PREMIUM_AMOUNT) || 0; // Correct property name
-        //   const odPremium = parseFloat(item.MOTOR_OD_PREMIUM_AMOUNT) || 0; // Correct property name
-        //   const commissionRate = parseFloat(item.COMMISSION_RATE_USED) || 0; // Correct property name
-        //   const P_type = item.POL_PRI_VVERTICAL_DESC; // Assuming this is equivalent to p_type
-
-        //   // Log the values to check if they are being read correctly
-        //   console.log(
-        //     `Terrorism Premium: ${terrorismPremium}, OD Premium: ${odPremium}, Commission Rate: ${commissionRate}, P_type: ${P_type}`
-        //   );
-
-        //   if (P_type && P_type.toLowerCase().includes("fire")) {
-        //     // Adjusted check for 'fire' in p_type
-        //     const terrorismPremiumCommission = terrorismPremium * 0.05; // 5% of terrorism premium
-        //     const odPremiumCommission = odPremium * (commissionRate / 100); // Commission on OD premium
-        //     commission = terrorismPremiumCommission + odPremiumCommission; // Total commission
-        //   } else {
-        //     commission = odPremium * (commissionRate / 100); // Calculate commission on OD premium only
-        //   }
-
-        //   // Log the calculated commission
-        //   console.log(`Item: ${JSON.stringify(item)}`);
-        //   console.log(`Calculated Commission: ${commission.toFixed(2)}`);
-
-        //   return {
-        //     ...item,
-        //     commission: commission.toFixed(2), // Ensure it's a fixed decimal
-        //   };
-        // });
 
         setInsuranceData(flattenedInsuranceData);
         setBrokerData(flattenedBrokerData);
@@ -103,144 +65,153 @@ const OverviewPage = () => {
     fetchData();
   }, []);
 
-  // Comparing insurance data with broker data
-  const matchData = insuranceData.filter((insurance) =>
-    brokerData.some((broker) => broker.policyNumber === insurance.policyNumber)
+  // Filter matched data
+  const matchData = insuranceData.filter((insurance) => {
+    const broker = brokerData.find(
+      (broker) => broker.policyNumber === insurance.policyNumber
+    );
+    return broker && insurance.commission === broker.commission;
+  });
+
+// const positiveData = insuranceData.filter((insurance) =>
+//   brokerData.some(
+//     (broker) =>
+//       broker["Policy Number"] === insurance["Policy Number"] &&
+//       broker["commission"] < insurance["commission"] 
+//   )
+// );
+
+const positiveData = insuranceData.filter((insurance) => {
+  const broker = brokerData.find(
+    (broker) => broker.policyNumber === insurance.policyNumber
   );
+  return broker && insurance.commission < broker.commission;
+});
 
-  const positiveData = insuranceData.filter((insurance) => {
-    const broker = brokerData.find(
-      (broker) => broker.policyNumber === insurance.policyNumber
-    );
-    return broker && insurance.percentage < broker.percentage;
-  });
+const negativeData = insuranceData.filter((insurance) => {
+  const broker = brokerData.find(
+    (broker) => broker.policyNumber === insurance.policyNumber
+  );
+  return broker && insurance.commission > broker.commission;
+});
+  // // Filter increased data
+  // const positiveData = insuranceData.filter((insurance) => {
+  //   const broker = brokerData.find(
+  //     (broker) => broker["Policy Number"] === insurance["Policy Number"]
+  //   );
+  //   return broker && broker.Percentage < insurance.Percentage;
+  // });
 
-  const negativeData = insuranceData.filter((insurance) => {
-    const broker = brokerData.find(
-      (broker) => broker.policyNumber === insurance.policyNumber
-    );
-    return broker && insurance.percentage > broker.percentage;
-  });
+  // // Filter decreased data
+  // const negativeData = insuranceData.filter((insurance) => {
+  //   const broker = brokerData.find(
+  //     (broker) => broker["Policy Number"] === insurance["Policy Number"]
+  //   );
+  //   return broker && insurance.Percentage > broker.Percentage;
+  // });
 
   const bankNames = [
-    ...new Set(insuranceData.map((item) => item["p_insurerName"])),
+    ...new Set(brokerData.map((item) => item["p_insurerName"])),
   ];
 
-  // Filter data based on the selected bank
-  const filteredData = (data) =>
-    selectedBank
-      ? data.filter((item) => item["p_insurerName"] === selectedBank)
-      : data;
+    // Filter data based on the selected bank
+    const filteredData = (data) =>
+      selectedBank
+        ? data.filter((item) => item["p_insurerName"] === selectedBank)
+        : data;
 
-  // Function to render table with filtered data
-  const renderTable = (data, title, showDifference = false) => {
-    if (data.length === 0) {
-      return <Typography>No Data Available</Typography>;
-    }
-
-    console.log("Data for table:", data);
-    // Extract column names from the first item in the data
-    const columnNames = [...new Set(data.flatMap(Object.keys))];
-
-    return (
-      <div style={{ marginTop: "30px" }}>
-        <Typography variant="h6" gutterBottom>
-          {title}
-        </Typography>
-        <TableContainer
-          component={Paper}
-          sx={{
-            backgroundColor: "ffffff",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Table>
-            <TableHead>
+        
+  const renderTable = (data, title) => (
+    <div style={{ marginTop: "30px" }}>
+      <Typography variant="h6" gutterBottom>
+        {title}
+      </Typography>
+      <TableContainer
+        component={Paper}
+        sx={{
+          backgroundColor: "white",
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ color: "#000000" }}>PolicyNumber</TableCell>
+              <TableCell sx={{ color: "#000000" }}>p_insurerName</TableCell>
+              <TableCell sx={{ color: "#000000" }}>cName</TableCell>
+              <TableCell sx={{ color: "#000000" }}>p_type</TableCell>
+              <TableCell sx={{ color: "#000000" }}>commissionRate</TableCell>
+              <TableCell sx={{ color: "#000000" }}>commission </TableCell>
+              <TableCell sx={{ color: "#000000" }}>Other commission</TableCell>
+              <TableCell sx={{ color: "#000000" }}>Percentage</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.length > 0 ? (
+              data.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={{ color: "#000000" }}>{item["PolicyNumber"]}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item["p_insurerName"]}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item["cName"]}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item["p_type"]}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item["commissionRate"]}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item["commission"]}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item["OtherCommission"]}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item.Percentage}%</TableCell>
+                </TableRow>
+              ))
+            ) : (
               <TableRow>
-                {columnNames.map((columnName, index) => (
-                  <TableCell key={index} sx={{ color: "#6366F1" }}>
-                    {columnName}
-                  </TableCell>
-                ))}
-                {showDifference && (
-                  <TableCell sx={{ color: "#6366f1" }}>Difference</TableCell>
-                )}
-                <TableCell sx={{ color: "#6366f1" }}>Percentage</TableCell>
-                <TableCell sx={{ color: "#6366f1" }}>
-                  Insurance Commission
+                <TableCell
+                  colSpan={5}
+                  style={{ color: "#9ca3af", textAlign: "center" }}
+                >
+                  No Data Available
                 </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((item, index) => (
-                <TableRow key={index}>
-                  {columnNames.map((columnName) => (
-                    <TableCell key={columnName} sx={{ color: "#000000" }}>
-                      {item[columnName] !== undefined
-                        ? item[columnName]
-                        : "N/A"}
-                    </TableCell>
-                  ))}
-                  {showDifference && (
-                    <TableCell sx={{ color: "#000000" }}>
-                      {item.Difference !== undefined ? item.Difference : "N/A"}
-                    </TableCell>
-                  )}
-                  <TableCell sx={{ color: "#000000" }}>
-                    {" "}
-                    {item.Percentage !== undefined
-                      ? item.Percentage + "%"
-                      : "N/A"}
-                    %
-                  </TableCell>
-                  <TableCell sx={{ color: "#000000" }}>
-                    {item.commission !== undefined ? item.commission : "N/A"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-    );
-  };
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
 
-  // Export functions
-  const exportToExcel = (data) => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-    XLSX.writeFile(workbook, "data.xlsx");
-  };
-
-  // Updated PDF export function
-  const exportToPDF = (data) => {
-    const doc = new jsPDF();
-    const tableColumn = [
-      "Bank Name",
-      "Name",
-      "Policy Number",
-      "Vehicle Number",
-      "Amount",
-      "Percentage",
-    ];
-    const tableRows = data.map((item) => [
-      item["Bank Name"],
-      item["Name"],
-      item["Policy Number"],
-      item["Vehicle Number"],
-      `${item.Amount}`,
-      item["Percentage"],
-    ]);
-
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: 30,
-    });
-    doc.save("data.pdf");
-  };
-
+    // Export functions
+    const exportToExcel = (data) => {
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+      XLSX.writeFile(workbook, "data.xlsx");
+    };
+  
+    // Updated PDF export function
+    const exportToPDF = (data) => {
+      const doc = new jsPDF();
+      const tableColumn = [
+        "Bank Name",
+        "Name",
+        "Policy Number",
+        "Vehicle Number",
+        "Amount",
+        "Percentage",
+      ];
+      const tableRows = data.map((item) => [
+        item["Bank Name"],
+        item["Name"],
+        item["Policy Number"],
+        item["Vehicle Number"],
+        `${item.Amount}`,
+        item["Percentage"],
+      ]);
+  
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 30,
+      });
+      doc.save("data.pdf");
+    };
+  
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography>Error: {error}</Typography>;
 
@@ -249,7 +220,8 @@ const OverviewPage = () => {
       className="flex-1 overflow-auto relative z-10"
       style={{ backgroundColor: "#94a5db" }}
     >
-      <main className="max-w-7xl mx-auto py-6 px-1 lg:px-6">
+      <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
+        {/* Select Dropdown */}
         <FormControl
           style={{
             display: "flex",
@@ -257,7 +229,6 @@ const OverviewPage = () => {
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: "20px",
-            width: "100%",
           }}
         >
           <div className="container flex justify-end items-center mb-4 sm:mb-0 w-full sm:w-auto">
@@ -289,37 +260,36 @@ const OverviewPage = () => {
             </Menu>
           </div>
 
-          {/* Select Dropdown */}
           <FormControl sx={{ minWidth: 200 }} className="w-full sm:w-auto">
-            <InputLabel
-              id="bank-select-label"
-              className="text-white-500 text-sm font-medium"
-            >
-              Filter by Bank
-            </InputLabel>
-            <Select
-              labelId="bank-select-label"
-              value={selectedBank}
-              label="Filter by Bank"
-              onChange={(e) => setSelectedBank(e.target.value)}
-              className="bg-[#cdd5ee] text-black border border-gray-500 rounded-lg mb-4 text-sm focus:border-white-500 focus:outline-none transition-all duration-300 w-full sm:w-auto"
-              MenuProps={{
-                PaperProps: {
-                  className: "bg-[#cdd5ee] text-white shadow-lg rounded-lg",
-                },
-              }}
-              sx={{ lineHeight: "1.2", borderRadius: "8px" }}
-            >
-              <MenuItem value="">
-                <span className="#cdd5ee">All Banks</span>
+          <InputLabel
+            id="bank-select-label"
+            className="text-white-500 text-sm font-medium"
+          >
+            Filter by Bank
+          </InputLabel>
+          <Select
+            labelId="bank-select-label"
+            value={selectedBank}
+            label="Filter by Bank"
+            onChange={(e) => setSelectedBank(e.target.value)}
+            className="bg-[#cdd5ee] text-black border border-gray-500 rounded-lg mb-4 text-sm focus:border-white-500 focus:outline-none transition-all duration-300 w-full sm:w-auto"
+            MenuProps={{
+              PaperProps: {
+                className: "bg-[#cdd5ee] text-white shadow-lg rounded-lg",
+              },
+            }}
+            sx={{ lineHeight: "1.2", borderRadius: "8px" }}
+          >
+            <MenuItem value="">
+              <span className="#cdd5ee">All Banks</span>
+            </MenuItem>
+            {bankNames.map((bank, index) => (
+              <MenuItem key={index} value={bank}>
+                <span className="text-black-400">{bank}</span>
               </MenuItem>
-              {bankNames.map((bank, index) => (
-                <MenuItem key={index} value={bank}>
-                  <span className="text-black-400">{bank}</span>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            ))}
+          </Select>
+        </FormControl>
         </FormControl>
 
         <motion.div
@@ -331,7 +301,7 @@ const OverviewPage = () => {
           <StatCard
             name={<span style={{ color: "#000000" }}>All Data</span>}
             icon={Zap}
-            value={filteredData(insuranceData).length}
+            value={filteredData(brokerData).length}
             color="#6366F1"
             onViewClick={() => setActiveTable("allData")}
           />
@@ -339,31 +309,29 @@ const OverviewPage = () => {
             name={<span style={{ color: "#000000" }}>Match Data</span>}
             icon={Users}
             value={filteredData(matchData).length}
-            color="#34D399"
+            color="#8B5CF6"
             onViewClick={() => setActiveTable("matchData")}
           />
           <StatCard
             name={<span style={{ color: "#000000" }}>+ Count Data</span>}
-            icon={BarChart2}
+            icon={ShoppingBag}
             value={filteredData(positiveData).length}
-            color="#FBBF24"
+            color="#EC4899"
             onViewClick={() => setActiveTable("positiveData")}
           />
           <StatCard
             name={<span style={{ color: "#000000" }}>- Count Data</span>}
-            icon={ShoppingBag}
+            icon={BarChart2}
             value={filteredData(negativeData).length}
-            color="#EF4444"
+            color="#10B981"
             onViewClick={() => setActiveTable("negativeData")}
           />
         </motion.div>
 
-        {/* Render Tables */}
-        {activeTable === "allData" && renderTable(insuranceData, "All Data")}
+        {activeTable === "allData" && renderTable(filteredData(brokerData), "All Data")}
         {activeTable === "matchData" && renderTable(matchData, "Match Data")}
         {activeTable === "positiveData" && renderTable(positiveData, "+ Count Data")}
         {activeTable === "negativeData" && renderTable(negativeData, "- Count Data")}
-
       </main>
     </div>
   );
