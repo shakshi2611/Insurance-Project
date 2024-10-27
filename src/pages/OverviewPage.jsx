@@ -2,7 +2,6 @@ import { BarChart2, ShoppingBag, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios
-import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import "jspdf-autotable";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -35,6 +34,17 @@ const OverviewPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [error, setError] = useState(null);
 
+  // const calculateodPremiumPercentage = (data) => {
+  //   return data.map((entry) => {
+  //     const odPremiumpercentage =
+  //       entry.odPremium && entry.commissionRate
+  //         ? (entry.odPremium * entry.commissionRate) / 100
+  //         : 0;
+  //     return { ...entry, odPremiumPercentage: odPremiumpercentage.toFixed(2) }; // Make sure 'Percentage' is uppercase to match the table
+  //   });
+  // };
+  
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -49,8 +59,12 @@ const OverviewPage = () => {
         const flattenedInsuranceData = insuranceResponse.data.flatMap(
           (file) => file.content
         );
-        const flattenedBrokerData = brokerResponse.data.flatMap(
-          (file) => file.content
+        const flattenedBrokerData = brokerResponse.data.flatMap((file) =>
+          file.content.map((item) => ({
+            ...item,
+            commissionRatePercentage: ((item.commissionRate / item.odPremium) * 100).toFixed(2),
+            rewardPercentage: ((item.Reward / item.odPremium) * 100).toFixed(2),
+          }))
         );
 
         console.log(insuranceData);
@@ -68,21 +82,21 @@ const OverviewPage = () => {
     fetchData();
   }, []);
 
-  const matchData = insuranceData.filter((insurance) => {
+  const matchData = brokerData.filter((insurance) => {
     const broker = brokerData.find(
       (broker) => broker.policyNumber === insurance.policyNumber
     );
     return broker && insurance.commission === broker.commission;
   });
 
-  const positiveData = insuranceData.filter((insurance) => {
+  const positiveData = brokerData.filter((insurance) => {
     const broker = brokerData.find(
       (broker) => broker.policyNumber === insurance.policyNumber
     );
     return broker && insurance.commission < broker.commission;
   });
 
-  const negativeData = insuranceData.filter((insurance) => {
+  const negativeData = brokerData.filter((insurance) => {
     const broker = brokerData.find(
       (broker) => broker.policyNumber === insurance.policyNumber
     );
@@ -121,7 +135,9 @@ const OverviewPage = () => {
               <TableCell sx={{ color: "#000000" }}>commissionRate</TableCell>
               <TableCell sx={{ color: "#000000" }}>commission </TableCell>
               <TableCell sx={{ color: "#000000" }}>Other commission</TableCell>
-              <TableCell sx={{ color: "#000000" }}>Percentage</TableCell>
+              <TableCell sx={{ color: "#000000" }}>odPremiumPercentage</TableCell>
+              <TableCell sx={{ color: "#000000" }}>commissionRate % </TableCell>
+              <TableCell sx={{ color: "#000000" }}>Reward % </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -149,9 +165,8 @@ const OverviewPage = () => {
                   <TableCell sx={{ color: "#000000" }}>
                     {item["OtherCommission"]}
                   </TableCell>
-                  <TableCell sx={{ color: "#000000" }}>
-                    {item.Percentage}%
-                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item.commissionRatePercentage}%</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item.rewardPercentage}%</TableCell>
                 </TableRow>
               ))
             ) : (
@@ -322,8 +337,8 @@ const OverviewPage = () => {
           />
         </motion.div>
 
-        {activeTable === "allData" &&
-          renderTable(filteredData(brokerData), "All Data")}
+        {filteredData(brokerData).length > 0 &&
+ activeTable === "allData" && renderTable(filteredData(brokerData), "All Data")}
         {activeTable === "matchData" &&
           renderTable(filteredData(matchData), "Match Data")}
         {activeTable === "positiveData" &&
