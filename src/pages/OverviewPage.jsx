@@ -53,6 +53,38 @@ const OverviewPage = () => {
           (file) => file.content
         );
 
+        // Separate data into "fire" and "non-fire" categories and calculate values
+        const fireData = [];
+        const nonFireData = [];
+
+        flattenedBrokerData.forEach((broker) => {
+          if (broker.p_type === "fire") {
+            const commission = broker.odPremium * (broker.commissionRate / 100);
+            const otherCommission = broker.odPremium * (broker.Percentage / 100);
+            const terrorismBrokRate = broker.TerrorismPremium * 0.05;
+            const totalCommission = commission + otherCommission + terrorismBrokRate;
+
+            fireData.push({
+              ...broker,
+              commission,
+              otherCommission,
+              terrorismBrokRate,
+              totalCommission,
+            });
+          } else {
+            const commission = broker.odPremium * (broker.commissionRate / 100);
+            const otherCommission = broker.odPremium * (broker.Percentage / 100);
+            const totalCommission = commission + otherCommission;
+
+            nonFireData.push({
+              ...broker,
+              commission,
+              otherCommission,
+              totalCommission,
+            });
+          }
+        });
+
         setInsuranceData(flattenedInsuranceData);
         setBrokerData(flattenedBrokerData);
       } catch (err) {
@@ -65,7 +97,6 @@ const OverviewPage = () => {
     fetchData();
   }, []);
 
-  // Filter matched data
   const matchData = insuranceData.filter((insurance) => {
     const broker = brokerData.find(
       (broker) => broker.policyNumber === insurance.policyNumber
@@ -73,32 +104,30 @@ const OverviewPage = () => {
     return broker && insurance.commission === broker.commission;
   });
 
+  const positiveData = insuranceData.filter((insurance) => {
+    const broker = brokerData.find(
+      (broker) => broker.policyNumber === insurance.policyNumber
+    );
+    return broker && insurance.commission < broker.commission;
+  });
 
-const positiveData = insuranceData.filter((insurance) => {
-  const broker = brokerData.find(
-    (broker) => broker.policyNumber === insurance.policyNumber
-  );
-  return broker && insurance.commission < broker.commission;
-});
-
-const negativeData = insuranceData.filter((insurance) => {
-  const broker = brokerData.find(
-    (broker) => broker.policyNumber === insurance.policyNumber
-  );
-  return broker && insurance.commission > broker.commission;
-});
+  const negativeData = insuranceData.filter((insurance) => {
+    const broker = brokerData.find(
+      (broker) => broker.policyNumber === insurance.policyNumber
+    );
+    return broker && insurance.commission > broker.commission;
+  });
 
   const bankNames = [
     ...new Set(brokerData.map((item) => item["p_insurerName"])),
   ];
 
-    // Filter data based on the selected bank
-    const filteredData = (data) =>
-      selectedBank
-        ? data.filter((item) => item["p_insurerName"] === selectedBank)
-        : data;
+  // Filter data based on the selected bank
+  const filteredData = (data) =>
+    selectedBank
+      ? data.filter((item) => item["p_insurerName"] === selectedBank)
+      : data;
 
-        
   const renderTable = (data, title) => (
     <div style={{ marginTop: "30px" }}>
       <Typography variant="h6" gutterBottom>
@@ -128,14 +157,30 @@ const negativeData = insuranceData.filter((insurance) => {
             {data.length > 0 ? (
               data.map((item, index) => (
                 <TableRow key={index}>
-                  <TableCell sx={{ color: "#000000" }}>{item["PolicyNumber"]}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item["p_insurerName"]}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item["cName"]}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item["p_type"]}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item["commissionRate"]}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item["commission"]}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item["OtherCommission"]}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.Percentage}%</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item["PolicyNumber"]}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item["p_insurerName"]}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item["cName"]}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item["p_type"]}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item["commissionRate"]}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item["commission"]}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item["OtherCommission"]}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item.Percentage}%
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -154,42 +199,42 @@ const negativeData = insuranceData.filter((insurance) => {
     </div>
   );
 
-    // Export functions
-    const exportToExcel = (data) => {
-      const worksheet = XLSX.utils.json_to_sheet(data);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-      XLSX.writeFile(workbook, "data.xlsx");
-    };
-  
-    // Updated PDF export function
-    const exportToPDF = (data) => {
-      const doc = new jsPDF();
-      const tableColumn = [
-        "Bank Name",
-        "Name",
-        "Policy Number",
-        "Vehicle Number",
-        "Amount",
-        "Percentage",
-      ];
-      const tableRows = data.map((item) => [
-        item["Bank Name"],
-        item["Name"],
-        item["Policy Number"],
-        item["Vehicle Number"],
-        `${item.Amount}`,
-        item["Percentage"],
-      ]);
-  
-      doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 30,
-      });
-      doc.save("data.pdf");
-    };
-  
+  // Export functions
+  const exportToExcel = (data) => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+    XLSX.writeFile(workbook, "data.xlsx");
+  };
+
+  // Updated PDF export function
+  const exportToPDF = (data) => {
+    const doc = new jsPDF();
+    const tableColumn = [
+      "Bank Name",
+      "Name",
+      "Policy Number",
+      "Vehicle Number",
+      "Amount",
+      "Percentage",
+    ];
+    const tableRows = data.map((item) => [
+      item["Bank Name"],
+      item["Name"],
+      item["Policy Number"],
+      item["Vehicle Number"],
+      `${item.Amount}`,
+      item["Percentage"],
+    ]);
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+    });
+    doc.save("data.pdf");
+  };
+
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography>Error: {error}</Typography>;
 
@@ -239,35 +284,35 @@ const negativeData = insuranceData.filter((insurance) => {
           </div>
 
           <FormControl sx={{ minWidth: 200 }} className="w-full sm:w-auto">
-          <InputLabel
-            id="bank-select-label"
-            className="text-white-500 text-sm font-medium"
-          >
-            Filter by Bank
-          </InputLabel>
-          <Select
-            labelId="bank-select-label"
-            value={selectedBank}
-            label="Filter by Bank"
-            onChange={(e) => setSelectedBank(e.target.value)}
-            className="bg-[#cdd5ee] text-black border border-gray-500 rounded-lg mb-4 text-sm focus:border-white-500 focus:outline-none transition-all duration-300 w-full sm:w-auto"
-            MenuProps={{
-              PaperProps: {
-                className: "bg-[#cdd5ee] text-white shadow-lg rounded-lg",
-              },
-            }}
-            sx={{ lineHeight: "1.2", borderRadius: "8px" }}
-          >
-            <MenuItem value="">
-              <span className="#cdd5ee">All Banks</span>
-            </MenuItem>
-            {bankNames.map((bank, index) => (
-              <MenuItem key={index} value={bank}>
-                <span className="text-black-400">{bank}</span>
+            <InputLabel
+              id="bank-select-label"
+              className="text-white-500 text-sm font-medium"
+            >
+              Filter by Bank
+            </InputLabel>
+            <Select
+              labelId="bank-select-label"
+              value={selectedBank}
+              label="Filter by Bank"
+              onChange={(e) => setSelectedBank(e.target.value)}
+              className="bg-[#cdd5ee] text-black border border-gray-500 rounded-lg mb-4 text-sm focus:border-white-500 focus:outline-none transition-all duration-300 w-full sm:w-auto"
+              MenuProps={{
+                PaperProps: {
+                  className: "bg-[#cdd5ee] text-white shadow-lg rounded-lg",
+                },
+              }}
+              sx={{ lineHeight: "1.2", borderRadius: "8px" }}
+            >
+              <MenuItem value="">
+                <span className="#cdd5ee">All Banks</span>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {bankNames.map((bank, index) => (
+                <MenuItem key={index} value={bank}>
+                  <span className="text-black-400">{bank}</span>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </FormControl>
 
         <motion.div
@@ -306,10 +351,14 @@ const negativeData = insuranceData.filter((insurance) => {
           />
         </motion.div>
 
-        {activeTable === "allData" && renderTable(filteredData(brokerData), "All Data")}
-        {activeTable === "matchData" && renderTable(filteredData(matchData), "Match Data")}
-        {activeTable === "positiveData" && renderTable(filteredData(positiveData), "+ Count Data")}
-        {activeTable === "negativeData" && renderTable(filteredData(negativeData), "- Count Data")}
+        {activeTable === "allData" &&
+          renderTable(filteredData(brokerData), "All Data")}
+        {activeTable === "matchData" &&
+          renderTable(filteredData(matchData), "Match Data")}
+        {activeTable === "positiveData" &&
+          renderTable(filteredData(positiveData), "+ Count Data")}
+        {activeTable === "negativeData" &&
+          renderTable(filteredData(negativeData), "- Count Data")}
       </main>
     </div>
   );
