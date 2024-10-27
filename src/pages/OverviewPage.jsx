@@ -43,8 +43,7 @@ const OverviewPage = () => {
   //     return { ...entry, odPremiumPercentage: odPremiumpercentage.toFixed(2) }; // Make sure 'Percentage' is uppercase to match the table
   //   });
   // };
-  
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -62,11 +61,13 @@ const OverviewPage = () => {
         const flattenedBrokerData = brokerResponse.data.flatMap((file) =>
           file.content.map((item) => ({
             ...item,
-            commissionRatePercentage: ((item.commissionRate / item.odPremium) * 100).toFixed(2),
-            rewardPercentage: ((item.Reward / item.odPremium) * 100).toFixed(2),
+            commissionRateAmount: ((item.commissionRate / 100) * item.odPremium).toFixed(2),
+            rewardAmount: ((item.Reward / 100) * item.odPremium).toFixed(2),
+            
           }))
         );
-
+        
+        
         console.log(insuranceData);
         console.log(brokerData);
         // // Separate data into "fire" and "non-fire" categories and calculate values
@@ -135,9 +136,8 @@ const OverviewPage = () => {
               <TableCell sx={{ color: "#000000" }}>commissionRate</TableCell>
               <TableCell sx={{ color: "#000000" }}>commission </TableCell>
               <TableCell sx={{ color: "#000000" }}>Other commission</TableCell>
-              <TableCell sx={{ color: "#000000" }}>odPremiumPercentage</TableCell>
-              <TableCell sx={{ color: "#000000" }}>commissionRate % </TableCell>
-              <TableCell sx={{ color: "#000000" }}>Reward % </TableCell>
+              <TableCell sx={{ color: "#000000" }}>commissionRate Amount </TableCell>
+              <TableCell sx={{ color: "#000000" }}>Reward Amount </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -165,8 +165,12 @@ const OverviewPage = () => {
                   <TableCell sx={{ color: "#000000" }}>
                     {item["OtherCommission"]}
                   </TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.commissionRatePercentage}%</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.rewardPercentage}%</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                    {item.commissionRateAmount}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                  {item.rewardAmount}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -338,7 +342,8 @@ const OverviewPage = () => {
         </motion.div>
 
         {filteredData(brokerData).length > 0 &&
- activeTable === "allData" && renderTable(filteredData(brokerData), "All Data")}
+          activeTable === "allData" &&
+          renderTable(filteredData(brokerData), "All Data")}
         {activeTable === "matchData" &&
           renderTable(filteredData(matchData), "Match Data")}
         {activeTable === "positiveData" &&
