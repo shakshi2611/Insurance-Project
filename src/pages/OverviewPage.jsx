@@ -53,38 +53,9 @@ const OverviewPage = () => {
           (file) => file.content
         );
 
-        // Separate data into "fire" and "non-fire" categories and calculate values
-        const fireData = [];
-        const nonFireData = [];
-
-        flattenedBrokerData.forEach((broker) => {
-          if (broker.p_type === "fire") {
-            const commission = broker.odPremium * (broker.commissionRate / 100);
-            const otherCommission = broker.odPremium * (broker.Percentage / 100);
-            const terrorismBrokRate = broker.TerrorismPremium * 0.05;
-            const totalCommission = commission + otherCommission + terrorismBrokRate;
-
-            fireData.push({
-              ...broker,
-              commission,
-              otherCommission,
-              terrorismBrokRate,
-              totalCommission,
-            });
-          } else {
-            const commission = broker.odPremium * (broker.commissionRate / 100);
-            const otherCommission = broker.odPremium * (broker.Percentage / 100);
-            const totalCommission = commission + otherCommission;
-
-            nonFireData.push({
-              ...broker,
-              commission,
-              otherCommission,
-              totalCommission,
-            });
-          }
-        });
-
+        console.log(insuranceData);
+        console.log(brokerData);
+        // // Separate data into "fire" and "non-fire" categories and calculate values
         setInsuranceData(flattenedInsuranceData);
         setBrokerData(flattenedBrokerData);
       } catch (err) {

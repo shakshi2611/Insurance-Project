@@ -1,1 +1,200 @@
-{"insuranceFiles": [], "brokerFiles": []} 
+{
+  "insuranceFiles": [
+    {
+      "id": "49e0",
+      "name": "insurance_data_demo.xlsx",
+      "type": "excel",
+      "content": [
+        {
+          "PolicyNumber": "PN1001",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyA",
+          "p_type": "fire",
+          "commissionRate": 2.5,
+          "commission": 250,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1002",
+          "p_insurerName": "InsurerB",
+          "cName": "CompanyB",
+          "p_type": "life",
+          "commissionRate": 2.9,
+          "commission": 290,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1003",
+          "p_insurerName": "InsurerC",
+          "cName": "CompanyC",
+          "p_type": "vehicle",
+          "commissionRate": 1.6,
+          "commission": 160,
+          "OtherCommission": 10
+        },
+        {
+          "PolicyNumber": "PN1004",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyD",
+          "p_type": "health",
+          "commissionRate": 2.3,
+          "commission": 230,
+          "OtherCommission": 15
+        },
+        {
+          "PolicyNumber": "PN1005",
+          "p_insurerName": "InsurerB",
+          "cName": "CompanyE",
+          "p_type": "property",
+          "commissionRate": 2.9,
+          "commission": 290,
+          "OtherCommission": 5
+        },
+        {
+          "PolicyNumber": "PN1006",
+          "p_insurerName": "InsurerC",
+          "cName": "CompanyF",
+          "p_type": "fire",
+          "commissionRate": 2.5,
+          "commission": 250,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1007",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyG",
+          "p_type": "health",
+          "commissionRate": 1.8,
+          "commission": 180,
+          "OtherCommission": 20
+        },
+        {
+          "PolicyNumber": "PN1008",
+          "p_insurerName": "InsurerB",
+          "cName": "CompanyH",
+          "p_type": "vehicle",
+          "commissionRate": 3.1,
+          "commission": 310,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1009",
+          "p_insurerName": "InsurerC",
+          "cName": "CompanyI",
+          "p_type": "life",
+          "commissionRate": 1.9,
+          "commission": 190,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1010",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyJ",
+          "p_type": "property",
+          "commissionRate": 3,
+          "commission": 300,
+          "OtherCommission": 20
+        }
+      ]
+    }
+  ],
+  "brokerFiles": [
+    {
+      "id": "b457",
+      "name": "broker_data_demo.xlsx",
+      "type": "excel",
+      "content": [
+        {
+          "PolicyNumber": "PN1001",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyA",
+          "p_type": "fire",
+          "commissionRate": 2.5,
+          "commission": 250,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1002",
+          "p_insurerName": "InsurerB",
+          "cName": "CompanyB",
+          "p_type": "life",
+          "commissionRate": 3,
+          "commission": 300,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1003",
+          "p_insurerName": "InsurerC",
+          "cName": "CompanyC",
+          "p_type": "vehicle",
+          "commissionRate": 1.8,
+          "commission": 180,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1004",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyD",
+          "p_type": "health",
+          "commissionRate": 2.2,
+          "commission": 220,
+          "OtherCommission": 20
+        },
+        {
+          "PolicyNumber": "PN1005",
+          "p_insurerName": "InsurerB",
+          "cName": "CompanyE",
+          "p_type": "property",
+          "commissionRate": 2.8,
+          "commission": 280,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1006",
+          "p_insurerName": "InsurerC",
+          "cName": "CompanyF",
+          "p_type": "fire",
+          "commissionRate": 2.6,
+          "commission": 260,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1007",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyG",
+          "p_type": "health",
+          "commissionRate": 1.9,
+          "commission": 190,
+          "OtherCommission": 10
+        },
+        {
+          "PolicyNumber": "PN1008",
+          "p_insurerName": "InsurerB",
+          "cName": "CompanyH",
+          "p_type": "vehicle",
+          "commissionRate": 3.1,
+          "commission": 310,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1009",
+          "p_insurerName": "InsurerC",
+          "cName": "CompanyI",
+          "p_type": "life",
+          "commissionRate": 2,
+          "commission": 200,
+          "OtherCommission": 0
+        },
+        {
+          "PolicyNumber": "PN1010",
+          "p_insurerName": "InsurerA",
+          "cName": "CompanyJ",
+          "p_type": "property",
+          "commissionRate": 2.9,
+          "commission": 290,
+          "OtherCommission": 15
+        }
+      ]
+    }
+  ]
+}
