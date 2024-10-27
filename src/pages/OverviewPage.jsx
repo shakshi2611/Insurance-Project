@@ -32,17 +32,9 @@ const OverviewPage = () => {
   const [selectedBank, setSelectedBank] = useState("");
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [fireData, setFireData] = useState([]); 
+  const [nonFireData, setNonFireData] = useState([]);
   const [error, setError] = useState(null);
-
-  // const calculateodPremiumPercentage = (data) => {
-  //   return data.map((entry) => {
-  //     const odPremiumpercentage =
-  //       entry.odPremium && entry.commissionRate
-  //         ? (entry.odPremium * entry.commissionRate) / 100
-  //         : 0;
-  //     return { ...entry, odPremiumPercentage: odPremiumpercentage.toFixed(2) }; // Make sure 'Percentage' is uppercase to match the table
-  //   });
-  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +59,16 @@ const OverviewPage = () => {
           }))
         );
         
+        // Filter data into fire and non-fire categories
+        const fire = flattenedBrokerData.filter(item => item.p_type === 'fire').map(item => ({
+          ...item,
+          terrorismPremiumAmount: item.TerrorismPremium ? (item.TerrorismPremium * 0.05).toFixed(2) : 'N/A',
+        }));
+        const nonFire = flattenedBrokerData.filter(item => item.p_type === 'non-fire');
+
+        // Set fire and non-fire data
+        setFireData(fire);
+        setNonFireData(nonFire);
         
         console.log(insuranceData);
         console.log(brokerData);
@@ -138,6 +140,7 @@ const OverviewPage = () => {
               <TableCell sx={{ color: "#000000" }}>Other commission</TableCell>
               <TableCell sx={{ color: "#000000" }}>commissionRate Amount </TableCell>
               <TableCell sx={{ color: "#000000" }}>Reward Amount </TableCell>
+              <TableCell sx={{ color: "#000000" }}>Terrorism Premium Amount </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -170,6 +173,9 @@ const OverviewPage = () => {
                   </TableCell>
                   <TableCell sx={{ color: "#000000" }}>
                   {item.rewardAmount}
+                  </TableCell>
+                  <TableCell sx={{ color: "#000000" }}>
+                  {item.terrorismPremiumAmount}
                   </TableCell>
                 </TableRow>
               ))
@@ -350,6 +356,7 @@ const OverviewPage = () => {
           renderTable(filteredData(positiveData), "+ Count Data")}
         {activeTable === "negativeData" &&
           renderTable(filteredData(negativeData), "- Count Data")}
+          
       </main>
     </div>
   );
