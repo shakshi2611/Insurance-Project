@@ -20,6 +20,7 @@ const OverviewPage = () => {
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,6 +45,7 @@ const OverviewPage = () => {
               commissionRateAmount,
               rewardAmount,
               totalCommission: (parseFloat(commissionRateAmount) + parseFloat(rewardAmount)).toFixed(2), // Total commission calculation
+              netCommission: item.NetCommision || 'N/A' // Ensure NetCommision is included
             };
           })
         );
@@ -102,13 +104,12 @@ const negativeData = brokerData
       const difference = (matchingInsurance.ACTUAL_COMMISSION - broker.NetCommision).toFixed(2); // Calculate the difference
       return {
         ...broker,
-        difference, // Add the difference to each broker item
+        difference, 
       };
     }
-    return null; // Return null if no match is found
+    return null;
   })
-  .filter(item => item !== null); // Remove null entries from the list
-
+  .filter(item => item !== null); 
 
   const bankNames = [...new Set(brokerData.map(item => item.p_insurerName))];
 
@@ -129,14 +130,15 @@ const negativeData = brokerData
               <TableCell sx={{ color: "#000000" }}>Insurer Name</TableCell>
               <TableCell sx={{ color: "#000000" }}>Client Name</TableCell>
               <TableCell sx={{ color: "#000000" }}>Policy Type</TableCell>
-              <TableCell sx={{ color: "#000000" }}>odPremium</TableCell>
+              {/* <TableCell sx={{ color: "#000000" }}>odPremium</TableCell>
               <TableCell sx={{ color: "#000000" }}>Commission Rate</TableCell>
               <TableCell sx={{ color: "#000000" }}>Commission</TableCell>
               <TableCell sx={{ color: "#000000" }}>Reward</TableCell>
               <TableCell sx={{ color: "#000000" }}>Other Commission</TableCell>
               <TableCell sx={{ color: "#000000" }}>TerrorismPremium</TableCell>
               <TableCell sx={{ color: "#000000" }}>TerrorismBrokRate</TableCell>
-              <TableCell sx={{ color: "#000000" }}>TerrorismbrokAmnt</TableCell>
+              <TableCell sx={{ color: "#000000" }}>TerrorismbrokAmnt</TableCell> */}
+              <TableCell sx={{ color: "#000000" }}>Net Commission</TableCell>
               <TableCell sx={{ color: "#000000" }}>Difference</TableCell> {/* New Difference Column */}
             </TableRow>
           </TableHead>
@@ -149,14 +151,15 @@ const negativeData = brokerData
                   <TableCell sx={{ color: "#000000" }}>{item.p_insurerName}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.cName}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.p_type}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.odPremium}</TableCell>
+                  {/* <TableCell sx={{ color: "#000000" }}>{item.odPremium}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.commisionRate}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.commision}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.Reward}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.OtherCommision}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.TerrorismPremium}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.TerrorismBrokRate}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.TerrorismbrokAmnt}</TableCell>
+                  <TableCell sx={{ color: "#000000" }}>{item.TerrorismbrokAmnt}</TableCell> */}
+                  <TableCell sx={{ color: "#000000" }}>{item.NetCommision}</TableCell>   
                   <TableCell sx={{ color: "#000000" }}>{item.difference}</TableCell> {/* Displaying Difference */}
                 </TableRow>
               ))
@@ -187,7 +190,7 @@ const negativeData = brokerData
       CommissionRateAmount: item.commissionRateAmount,
       RewardAmount: item.rewardAmount,
       NetCommission: item.NetCommision,
-      Difference: item.difference, // Difference calculated earlier
+      Difference: item.difference , // Difference calculated earlier
     }));
   
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -228,7 +231,6 @@ const negativeData = brokerData
       theme: 'striped', // Optional: Adds a striped theme to the table
     });
   
-    // Save the PDF document
     doc.save("data.pdf");
   };
   
