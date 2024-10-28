@@ -83,6 +83,7 @@ const OverviewPage = () => {
     fetchData(); // Call fetchData function
   }, []);
 
+  const allData = brokerData;
   // Prepare data for verification
   const matchData = brokerData.filter((broker) =>
     insuranceData.some(
@@ -309,6 +310,16 @@ const OverviewPage = () => {
               open={Boolean(anchorEl)}
               onClose={() => setAnchorEl(null)}
             >
+              {activeTable === "allData" && (
+                <>
+                  <MenuItem onClick={() => exportToExcel(allData)}>
+                    Export to Excel
+                  </MenuItem>
+                  <MenuItem onClick={() => exportToPDF(allData)}>
+                    Export to PDF
+                  </MenuItem>
+                </>
+              )}
               {activeTable === "positiveData" && (
                 <>
                   <MenuItem onClick={() => exportToExcel(positiveData)}>
