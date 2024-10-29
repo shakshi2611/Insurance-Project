@@ -116,7 +116,7 @@ const Sidebar = ({ onLogout }) => {
           ))}
         </nav>
         
-        {/* <button
+        <button
           className={`flex items-center justify-center ${
             isUploadActive ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-600 hover:bg-yellow-700"
           } text-white font-bold py-2 rounded transition duration-200 sm:w-auto mb-2`}
@@ -128,7 +128,7 @@ const Sidebar = ({ onLogout }) => {
           {isSidebarOpen && (
             <span className="ml-2">Restart Process</span>
           )}
-        </button> */}
+        </button>
 
         <button
           className="flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded transition duration-200 sm:w-auto"

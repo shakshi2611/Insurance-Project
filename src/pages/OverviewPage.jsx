@@ -165,14 +165,7 @@ const OverviewPage = () => {
               <TableCell sx={{ color: "#000000" }}>Insurer Name</TableCell>
               <TableCell sx={{ color: "#000000" }}>Client Name</TableCell>
               <TableCell sx={{ color: "#000000" }}>Policy Type</TableCell>
-              {/* <TableCell sx={{ color: "#000000" }}>odPremium</TableCell>
-              <TableCell sx={{ color: "#000000" }}>Commission Rate</TableCell>
-              <TableCell sx={{ color: "#000000" }}>Commission</TableCell>
-              <TableCell sx={{ color: "#000000" }}>Reward</TableCell>
-              <TableCell sx={{ color: "#000000" }}>Other Commission</TableCell>
-              <TableCell sx={{ color: "#000000" }}>TerrorismPremium</TableCell>
-              <TableCell sx={{ color: "#000000" }}>TerrorismBrokRate</TableCell>
-              <TableCell sx={{ color: "#000000" }}>TerrorismbrokAmnt</TableCell> */}
+              
               <TableCell sx={{ color: "#000000" }}>Net Commission</TableCell>
               <TableCell sx={{ color: "#000000" }}>Difference</TableCell>{" "}
               {/* New Difference Column */}
@@ -192,14 +185,7 @@ const OverviewPage = () => {
                   </TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.cName}</TableCell>
                   <TableCell sx={{ color: "#000000" }}>{item.p_type}</TableCell>
-                  {/* <TableCell sx={{ color: "#000000" }}>{item.odPremium}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.commisionRate}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.commision}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.Reward}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.OtherCommision}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.TerrorismPremium}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.TerrorismBrokRate}</TableCell>
-                  <TableCell sx={{ color: "#000000" }}>{item.TerrorismbrokAmnt}</TableCell> */}
+                  
                   <TableCell sx={{ color: "#000000" }}>
                     {item.NetCommision}
                   </TableCell>
